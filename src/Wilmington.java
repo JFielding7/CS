@@ -83,8 +83,9 @@ public class Wilmington {
         
         wilmington();
         Intersection i1 = intersections.get(0);
-        Intersection i2 = find(streets.get(34), streets.get(36));
-        System.out.println(i1.getLocation());
+        
+        Intersection i2 = find(streets.get(18), streets.get(48));
+        System.out.println(i2.getLocation());
         
         Group g = shortestPath(i1, i2, streets, intersections);
         System.out.println(g);
