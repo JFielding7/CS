@@ -22,7 +22,7 @@ public class Wilmington {
         streets = new ArrayList<>();
         intersections = new ArrayList<>();
 
-        File street = new File("C:\\Users\\220700jf\\.vscode\\BFS\\WilmingtonMap\\src\\WilmingtonStreets.txt");
+        File street = new File("C:\\Users\\220700jf\\Documents\\BFS\\WilmingtonMap\\src\\WilmingtonStreets.txt");
         
         Scanner scan = new Scanner(street);
 
@@ -83,7 +83,7 @@ public class Wilmington {
         
         wilmington();
         Intersection i1 = intersections.get(0);
-        Intersection i2 = find(streets.get(33), streets.get(35));
+        Intersection i2 = find(streets.get(34), streets.get(36));
         System.out.println(i1.getLocation());
         
         Group g = shortestPath(i1, i2, streets, intersections);
@@ -214,7 +214,8 @@ class PathBuilder {
         PathBuilder p = this;
         ArrayList<Pair> path = new ArrayList<>();
         while(p != null){
-            path.add(0, new Pair(p.current, turn(p)));
+            //if(turn(p).charAt(0) == 'T')
+                path.add(0, new Pair(p.current, turn(p)));
             p = p.previous;
         }
         return path;
@@ -225,15 +226,18 @@ class PathBuilder {
         if(prev == null || prev.previous == null) return "Straight";
 
         PathBuilder prev2 = p.previous.previous;
-        if(prev2.b == null || prev2.b.street == p.b.street) return "Straight";
-        if(prev.current.onSameStreet(p.current) && prev2.current.onSameStreet(p.current)) return "Straight";
+        if(prev2.b == null || prev2.b.street == p.b.street || 
+        prev.current.onSameStreet(p.current) && prev2.current.onSameStreet(p.current)) return "Straight";
+
         boolean movingUp = prev.current.getLocation().x - prev2.current.getLocation().x > 0;
-        if(movingUp && current.getLocation().y > prev.b.street.getEqu().value(current.getLocation().x) || 
-        !movingUp && current.getLocation().y < prev.b.street.getEqu().value(current.getLocation().x)){
-            return "Right";
+        if((movingUp && current.getLocation().y > prev.b.street.getEqu().value(current.getLocation().x)) || 
+        (!movingUp && current.getLocation().y < prev.b.street.getEqu().value(current.getLocation().x))){
+            return "Turn Right on to " + p.b.street.getName();
         }
-        return "Left"; 
+        return "Turn Left on to " + p.b.street.getName(); 
     }
+
+
 
   }
 
