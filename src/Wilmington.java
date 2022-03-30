@@ -1,6 +1,5 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -13,7 +12,7 @@ public class Wilmington {
     private static final double LATITUDE50FT = 0.00013724198;
     private static final double LONGITUDE50FT = 0.000173437674;
 
-    private static Address[] places;
+    //private static Address[] places;
     private static ArrayList<Street> streets;
     private static ArrayList<Intersection> intersections;
 
@@ -28,34 +27,29 @@ public class Wilmington {
 
         while(scan.hasNext()){
             String[] road = scan.nextLine().split("  |, "); 
-            
-            streets.add(new Street(road[0], new Coordinate(road[1], road[2]), new Coordinate(road[3], road[4])));
+            boolean oneWay = road.length == 6 ? true : false;
+            streets.add(new Street(road[0], new Coordinate(road[1], road[2]), new Coordinate(road[3], road[4]), oneWay));
         }
 
         scan.close();
-        int count = 1;
-        for(Street s : streets){
-            //System.out.println(count + " " + s.getName() + " " + s.getCoord1());
-            count++;
-        }
 
         findIntersections();
     }
 
     public static void findIntersections() {
-        int number = 0;
+        
         for(int i = 0; i < streets.size()-1; i++){
             Street s1 = streets.get(i);
             for(int j = i+1; j < streets.size(); j++){
                 Street s2 = streets.get(j);
                 Coordinate inter = s1.getEqu().intersection(s2.getEqu());
                 if(doesInter(s1, s2, inter)){
-                    Intersection inters = new Intersection(inter, number, s1, s2);
+                    Intersection inters = new Intersection(inter, s1, s2);
                     //inters.compileBlocks();
                     s1.addIntersection(inters);
                     s2.addIntersection(inters);
                     intersections.add(inters);
-                    number++;
+                   
                 }
             }
             if(s1.getIntersections().size() > 1) s1.sortIntersections(0, s1.getIntersections().size() - 1);
@@ -82,23 +76,30 @@ public class Wilmington {
     public static void main(String...args) throws FileNotFoundException {
         
         wilmington();
-        Intersection i1 = intersections.get(0);
-        
-        Intersection i2 = find(streets.get(18), streets.get(48));
-        System.out.println(i2.getLocation());
+        Intersection i1 = find(streets.get(0), streets.get(3));
+        Street[] start = i1.getStreets();
+        System.out.println("Start:\n" + start[0].getName());
+        System.out.println(start[1].getName() + "\n");
+        Intersection i2 = find(streets.get(7), streets.get(8));
+        Street[] end = i2.getStreets();
+        System.out.println("Destination:\n" + end[0].getName());
+        System.out.println(end[1].getName() + "\n");
         
         Group g = shortestPath(i1, i2, streets, intersections);
-        System.out.println(g);
-        System.out.println();    
-        ArrayList<Pair> p = g.path.compilePath();
-        for(Pair inter : p){
-            System.out.println(inter.turn);
-            System.out.println();
+        // System.out.println(g);
+        // System.out.println();    
+
+        ArrayList<Packet> p = g.path.compilePath();
+        for(Packet inter : p){
+            
             System.out.println(inter.i.getStreets()[0].getName());
             System.out.println(inter.i.getStreets()[1].getName());
+            System.out.println(inter.turn);
+            //System.out.println("Continue for: " + (int)(inter.continueDist * 100 + 0.5) / 100.0 + " miles");
+            System.out.println();
         }
         //total distance
-        System.out.println((int)(g.dist * 100 + 0.5) / 100.0 + " miles");
+        System.out.println("Distance: " + (int)(g.dist * 100 + 0.5) / 100.0 + " miles");
         
     }
 
@@ -123,6 +124,7 @@ public class Wilmington {
             public int compare(Group g1, Group g2) {
                 return g1.dist > g2.dist ? 1 : -1;
             }
+
         });
 
         //adds the starting node to the queue, along with a distance of zero
@@ -200,6 +202,7 @@ class Group {
 
 class PathBuilder {
 
+    static int x = 0;
     PathBuilder previous;
     Intersection current;
     Block b;
@@ -210,45 +213,65 @@ class PathBuilder {
       this.b = b;
     }
 
-    public ArrayList<Pair> compilePath(){
+    public ArrayList<Packet> compilePath(){
 
         PathBuilder p = this;
-        ArrayList<Pair> path = new ArrayList<>();
+        ArrayList<Packet> path = new ArrayList<>();
+        Intersection thisTurn = p.current;
+        path.add(new Packet(thisTurn, "Arrive at your destination."));
+        
         while(p != null){
-            //if(turn(p).charAt(0) == 'T')
-                path.add(0, new Pair(p.current, turn(p)));
+            if(turn(p).charAt(0) == 'T'){
+                thisTurn = p.previous.current;
+                path.add(0, new Packet(thisTurn, turn(p)));
+                Packet prevTurn = path.get(1);
+                prevTurn.continueDist = Wilmington.calcDistance(thisTurn, prevTurn.i);
+            }
             p = p.previous;
         }
         return path;
     }
 
     private String turn(PathBuilder p){
+        x++;
         PathBuilder prev = p.previous;
         if(prev == null || prev.previous == null) return "Straight";
 
         PathBuilder prev2 = p.previous.previous;
-        if(prev2.b == null || prev2.b.street == p.b.street || 
+        if(prev2.b == null || prev2.b.street == p.b.street ||
         prev.current.onSameStreet(p.current) && prev2.current.onSameStreet(p.current)) return "Straight";
 
-        boolean movingUp = prev.current.getLocation().x - prev2.current.getLocation().x > 0;
+        boolean movingUp = (prev.current.getLocation().x - prev2.current.getLocation().x) > 0;
+        if(p.b.street.getName().equals("Augustine Cut Off")){
+            
+            System.out.println(p.current.getLocation());
+            System.out.println(p.current);
+            System.out.println(prev.current);
+            System.out.println(x);
+        }
+
         if((movingUp && current.getLocation().y > prev.b.street.getEqu().value(current.getLocation().x)) || 
         (!movingUp && current.getLocation().y < prev.b.street.getEqu().value(current.getLocation().x))){
+            
             return "Turn Right on to " + p.b.street.getName();
         }
         return "Turn Left on to " + p.b.street.getName(); 
     }
 
-
-
   }
 
-class Pair{
+class Packet{
     Intersection i;
     String turn;
+    double continueDist;
 
-    Pair(Intersection i, String turn){
+    Packet(Intersection i, String turn){
         this.i = i;
         this.turn = turn;
+    }
+
+    void setDist(double continueDist){
+        this.continueDist = continueDist;
 
     }
 }

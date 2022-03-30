@@ -2,12 +2,10 @@ public class Intersection {
 
     private Street[] streets;
     private Coordinate location;
-    private int number;
     private Block[] blocks;
 
-    public Intersection(Coordinate location, int number, Street...streets){
+    public Intersection(Coordinate location, Street...streets){
 
-        this.number = number;
         this.location = location;
         this.streets = streets;
     }
