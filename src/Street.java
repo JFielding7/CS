@@ -9,7 +9,7 @@ public class Street {
     private Coordinate coord1;
     private Coordinate coord2;
     private Equation equ;
-    private boolean oneWay;
+    private int oneWay;
     
     public Street(String name, int speedLimit, Intersection...intersections){
         this.name = name;
@@ -17,7 +17,7 @@ public class Street {
         this.intersections = new ArrayList<>();
     }
 
-    public Street(String name, Coordinate coord1, Coordinate coord2, boolean oneWay){
+    public Street(String name, Coordinate coord1, Coordinate coord2, int oneWay){
         this.name = name;
         this.coord1 = coord1;
         this.coord2 = coord2;
@@ -114,14 +114,14 @@ public class Street {
     public Intersection nextIntersection(Intersection prev) {
 
         int index = intersections.indexOf(prev) + 1;
-        if(index < intersections.size()) return intersections.get(index);
+        if(index < intersections.size() && oneWay != -1) return intersections.get(index);
         return null;
     }
 
     public Intersection prevIntersection(Intersection curr) {
 
         int index = intersections.indexOf(curr) - 1;
-        if(index > -1) return intersections.get(index);
+        if(index > -1 && oneWay != 1) return intersections.get(index);
         return null;
     }
 

@@ -27,7 +27,7 @@ public class Wilmington {
 
         while(scan.hasNext()){
             String[] road = scan.nextLine().split("  |, "); 
-            boolean oneWay = road.length == 6 ? true : false;
+            int oneWay = road.length == 6 ? Integer.parseInt(road[5]) : 0;
             streets.add(new Street(road[0], new Coordinate(road[1], road[2]), new Coordinate(road[3], road[4]), oneWay));
         }
 
@@ -76,11 +76,15 @@ public class Wilmington {
     public static void main(String...args) throws FileNotFoundException {
         
         wilmington();
+        ArrayList<Intersection> v = streets.get(0).getIntersections();
+        for(Intersection y : v){
+            System.out.println(y.getLocation());
+        }
         Intersection i1 = find(streets.get(0), streets.get(3));
         Street[] start = i1.getStreets();
         System.out.println("Start:\n" + start[0].getName());
         System.out.println(start[1].getName() + "\n");
-        Intersection i2 = find(streets.get(7), streets.get(8));
+        Intersection i2 = find(streets.get(17), streets.get(42));
         Street[] end = i2.getStreets();
         System.out.println("Destination:\n" + end[0].getName());
         System.out.println(end[1].getName() + "\n");
@@ -90,6 +94,12 @@ public class Wilmington {
         // System.out.println();    
 
         ArrayList<Packet> p = g.path.compilePath();
+        PathBuilder x = g.path;
+        while(x != null){
+            System.out.println(x.current + "\n");
+            x = x.previous;
+        }
+
         for(Packet inter : p){
             
             System.out.println(inter.i.getStreets()[0].getName());
@@ -202,15 +212,14 @@ class Group {
 
 class PathBuilder {
 
-    static int x = 0;
     PathBuilder previous;
     Intersection current;
-    Block b;
+    Block block;
   
     public PathBuilder(PathBuilder previous, Intersection current, Block b){
       this.current = current;
       this.previous = previous;
-      this.b = b;
+      this.block = b;
     }
 
     public ArrayList<Packet> compilePath(){
@@ -221,9 +230,10 @@ class PathBuilder {
         path.add(new Packet(thisTurn, "Arrive at your destination."));
         
         while(p != null){
-            if(turn(p).charAt(0) == 'T'){
+            String turn = turn(p);
+            if(turn.charAt(0) == 'T'){
                 thisTurn = p.previous.current;
-                path.add(0, new Packet(thisTurn, turn(p)));
+                path.add(0, new Packet(thisTurn, turn));
                 Packet prevTurn = path.get(1);
                 prevTurn.continueDist = Wilmington.calcDistance(thisTurn, prevTurn.i);
             }
@@ -233,29 +243,22 @@ class PathBuilder {
     }
 
     private String turn(PathBuilder p){
-        x++;
+
         PathBuilder prev = p.previous;
         if(prev == null || prev.previous == null) return "Straight";
 
         PathBuilder prev2 = p.previous.previous;
-        if(prev2.b == null || prev2.b.street == p.b.street ||
+        if(prev2.block == null || prev2.block.street == p.block.street ||
         prev.current.onSameStreet(p.current) && prev2.current.onSameStreet(p.current)) return "Straight";
 
         boolean movingUp = (prev.current.getLocation().x - prev2.current.getLocation().x) > 0;
-        if(p.b.street.getName().equals("Augustine Cut Off")){
-            
-            System.out.println(p.current.getLocation());
-            System.out.println(p.current);
-            System.out.println(prev.current);
-            System.out.println(x);
-        }
 
-        if((movingUp && current.getLocation().y > prev.b.street.getEqu().value(current.getLocation().x)) || 
-        (!movingUp && current.getLocation().y < prev.b.street.getEqu().value(current.getLocation().x))){
-            
-            return "Turn Right on to " + p.b.street.getName();
-        }
-        return "Turn Left on to " + p.b.street.getName(); 
+        if((movingUp && p.current.getLocation().y > prev.block.street.getEqu().value(p.current.getLocation().x)) || 
+        (!movingUp && p.current.getLocation().y < prev.block.street.getEqu().value(p.current.getLocation().x)))
+
+            return "Turn Right on to " + p.block.street.getName();
+        
+        return "Turn Left on to " + p.block.street.getName(); 
     }
 
   }
