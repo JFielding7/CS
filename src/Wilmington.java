@@ -76,15 +76,12 @@ public class Wilmington {
     public static void main(String...args) throws FileNotFoundException {
         
         wilmington();
-        ArrayList<Intersection> v = streets.get(0).getIntersections();
-        for(Intersection y : v){
-            System.out.println(y.getLocation());
-        }
-        Intersection i1 = find(streets.get(0), streets.get(3));
+        //System.out.println(find(streets.get(18), streets.get(19)).getLocation());
+        Intersection i1 = find(streets.get(19), streets.get(27));
         Street[] start = i1.getStreets();
         System.out.println("Start:\n" + start[0].getName());
         System.out.println(start[1].getName() + "\n");
-        Intersection i2 = find(streets.get(17), streets.get(42));
+        Intersection i2 = find(streets.get(3), streets.get(12));
         Street[] end = i2.getStreets();
         System.out.println("Destination:\n" + end[0].getName());
         System.out.println(end[1].getName() + "\n");
@@ -94,18 +91,14 @@ public class Wilmington {
         // System.out.println();    
 
         ArrayList<Packet> p = g.path.compilePath();
-        PathBuilder x = g.path;
-        while(x != null){
-            System.out.println(x.current + "\n");
-            x = x.previous;
-        }
 
         for(Packet inter : p){
             
             System.out.println(inter.i.getStreets()[0].getName());
             System.out.println(inter.i.getStreets()[1].getName());
             System.out.println(inter.turn);
-            //System.out.println("Continue for: " + (int)(inter.continueDist * 100 + 0.5) / 100.0 + " miles");
+            System.out.println(inter.i.getLocation());
+            System.out.println("Continue for: " + (int)(inter.continueDist * 100 + 0.5) / 100.0 + " miles");
             System.out.println();
         }
         //total distance
@@ -239,6 +232,9 @@ class PathBuilder {
             }
             p = p.previous;
         }
+        Packet secondTolast = path.get(path.size() - 2);
+        Packet last = path.get(path.size() - 1);
+        last.continueDist = Wilmington.calcDistance(secondTolast.i, last.i);
         return path;
     }
 

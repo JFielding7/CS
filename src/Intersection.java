@@ -23,6 +23,7 @@ public class Intersection {
     }
 
     public void compileBlocks(){
+
         this.blocks = new Block[4];
         Intersection next0 = streets[0].nextIntersection(this);
         if(next0 != null) blocks[0] = new Block(streets[0], this, next0);
