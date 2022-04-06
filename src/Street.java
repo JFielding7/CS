@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 //streets represent the edges of the graph
 public class Street {
@@ -10,6 +11,7 @@ public class Street {
     private Coordinate coord2;
     private Equation equ;
     private int oneWay;
+    private HashMap<Coordinate, Integer> zIntervals; 
     
     public Street(String name, int speedLimit, Intersection...intersections){
         this.name = name;
@@ -17,13 +19,28 @@ public class Street {
         this.intersections = new ArrayList<>();
     }
 
-    public Street(String name, Coordinate coord1, Coordinate coord2, int oneWay){
+    public Street(String name, Coordinate coord1, Coordinate coord2, int oneWay, HashMap<Coordinate, Integer> zIntervals){
         this.name = name;
         this.coord1 = coord1;
         this.coord2 = coord2;
         this.equ = new Equation(this.getSlope(), coord1);
         this.intersections = new ArrayList<>();
         this.oneWay = oneWay;
+        this.zIntervals = zIntervals;
+    }
+
+    public HashMap<Coordinate, Integer> getzIntervals() {
+
+        return zIntervals;
+    }
+
+    public int zPosition(double latitude){
+        for(Coordinate c : zIntervals.keySet()){
+            if(latitude >= c.x && latitude <= c.y){
+                return zIntervals.get(c);
+            }
+        }
+        return 0;
     }
 
     public Equation getEqu() {

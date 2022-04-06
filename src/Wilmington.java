@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Scanner;
@@ -27,8 +28,15 @@ public class Wilmington {
 
         while(scan.hasNext()){
             String[] road = scan.nextLine().split("  |, "); 
-            int oneWay = road.length == 6 ? Integer.parseInt(road[5]) : 0;
-            streets.add(new Street(road[0], new Coordinate(road[1], road[2]), new Coordinate(road[3], road[4]), oneWay));
+            int oneWay = road.length > 5 ? Integer.parseInt(road[5]) : 0;
+            HashMap<Coordinate, Integer> zIntervals = new HashMap<>();
+            for(int i = 6; i < road.length; i++){
+                String interval = road[i];
+                zIntervals.put(new Coordinate(interval.substring(interval.indexOf(":") + 1, interval.indexOf(",")), 
+                interval.substring(interval.indexOf(",") + 1)), 
+                Integer.parseInt(interval.substring(0, interval.indexOf(":"))));
+            }
+            streets.add(new Street(road[0], new Coordinate(road[1], road[2]), new Coordinate(road[3], road[4]), oneWay, zIntervals));
         }
 
         scan.close();
@@ -64,10 +72,10 @@ public class Wilmington {
     //finds the intersections between roads with and error of 50ft
     public static boolean doesInter(Street s1, Street s2, Coordinate inter){
         
-        return inter.x >= s1.xLowerBound() - LONGITUDE50FT && inter.x <= s1.xUpperBound() + LONGITUDE50FT 
+        return s1.zPosition(inter.x) == s2.zPosition(inter.x) && (inter.x >= s1.xLowerBound() - LONGITUDE50FT && inter.x <= s1.xUpperBound() + LONGITUDE50FT 
         && inter.y >= s1.yLowerBound() - LATITUDE50FT && inter.y <= s1.yUpperBound() + LATITUDE50FT
         && inter.x >= s2.xLowerBound() - LONGITUDE50FT && inter.x <= s2.xUpperBound() + LONGITUDE50FT 
-        && inter.y >= s2.yLowerBound() - LATITUDE50FT && inter.y <= s2.yUpperBound() + LATITUDE50FT;
+        && inter.y >= s2.yLowerBound() - LATITUDE50FT && inter.y <= s2.yUpperBound() + LATITUDE50FT);
     }
     
     //main method 
@@ -76,7 +84,11 @@ public class Wilmington {
     public static void main(String...args) throws FileNotFoundException {
         
         wilmington();
-        
+        System.out.println(streets.get(32));
+        for(Intersection i : streets.get(32).getIntersections()){
+            System.out.println(i);
+        }
+        System.exit(0);
         Intersection i1 = find(streets.get(0), streets.get(3));
         Street[] start = i1.getStreets();
         System.out.println("Start:\n" + start[0].getName());
