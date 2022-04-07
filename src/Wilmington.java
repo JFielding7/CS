@@ -84,17 +84,21 @@ public class Wilmington {
     public static void main(String...args) throws FileNotFoundException {
         
         wilmington();
-        System.out.println(streets.get(32));
-        for(Intersection i : streets.get(32).getIntersections()){
-            System.out.println(i);
-        }
-        System.exit(0);
+        Street str = streets.get(14);
+        System.out.println();
+        // for(Intersection i : str.getIntersections()){
+        //     System.out.println(i);
+        //     System.out.println(i.getStreets()[0].zPosition(i.getLocation().x));
+        //     System.out.println(i.getStreets()[1].zPosition(i.getLocation().x));
+        // }
+        
+        // System.exit(0);
         Intersection i1 = find(streets.get(0), streets.get(3));
         Street[] start = i1.getStreets();
         System.out.println("Start:\n" + start[0].getName());
         System.out.println(start[1].getName() + "\n");
         
-        Intersection i2 = find(streets.get(18), streets.get(49));
+        Intersection i2 = find(streets.get(23), streets.get(28));
         Street[] end = i2.getStreets();
         System.out.println("Destination:\n" + end[0].getName());
         System.out.println(end[1].getName() + "\n");
@@ -188,7 +192,7 @@ public class Wilmington {
         Coordinate point1 = i1.getLocation();
         Coordinate point2 = i2.getLocation();
         double disY = (point1.y - point2.y) * 54.6;
-        double disX = (point1.x - point2.x) * 69;
+        double disX = (point1.x - point2.x) * 69;                                
         return Math.sqrt(Math.pow(disX, 2) + Math.pow(disY, 2));
     }
 
@@ -237,6 +241,7 @@ class PathBuilder {
         
         while(p != null){
             String turn = turn(p);
+            System.out.println(p.current + " " + turn);
             if(turn.charAt(0) == 'T'){
                 thisTurn = p.previous.current;
                 path.add(0, new Instruction(thisTurn, turn));
