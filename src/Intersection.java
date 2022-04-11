@@ -18,8 +18,12 @@ public class Intersection {
         this.location = location;
     }
 
-    public Street[] getStreets(){
-        return this.streets;
+    public Street street1(){
+        return this.streets[0];
+    }
+
+    public Street street2() {
+        return this.streets[1];
     }
 
     public void compileBlocks(){

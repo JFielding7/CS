@@ -13,7 +13,7 @@ public class Block{
         this.distance = calcDistance();
     }
 
-    private double calcDistance(){
+    private double calcDistance() {
 
         Coordinate point1 = start.getLocation();
         Coordinate point2 = destination.getLocation();
@@ -22,7 +22,9 @@ public class Block{
 
     @Override
     public String toString(){
-        return this.street.getName() + " " + destination.getStreets()[0].getName() + " " + destination.getStreets()[1].getName();
+        return this.street.getName() + " " 
+        + destination.street1().getName() + " " 
+        + destination.street2().getName();
     }
 
 }

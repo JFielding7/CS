@@ -12,12 +12,6 @@ public class Street {
     private Equation equ;
     private int oneWay;
     private HashMap<Coordinate, Integer> zIntervals; 
-    
-    public Street(String name, int speedLimit, Intersection...intersections){
-        this.name = name;
-        this.speedLimit = speedLimit;
-        this.intersections = new ArrayList<>();
-    }
 
     public Street(String name, Coordinate coord1, Coordinate coord2, int oneWay, HashMap<Coordinate, Integer> zIntervals){
         this.name = name;
