@@ -13,7 +13,7 @@ public class Street {
     private int oneWay;
     private HashMap<Coordinate, Integer> zIntervals; 
 
-    public Street(String name, Coordinate coord1, Coordinate coord2, int oneWay, HashMap<Coordinate, Integer> zIntervals){
+    public Street(String name, Coordinate coord1, Coordinate coord2, int oneWay, HashMap<Coordinate, Integer> zIntervals, int speedLimit){
         this.name = name;
         this.coord1 = coord1;
         this.coord2 = coord2;
@@ -21,6 +21,7 @@ public class Street {
         this.intersections = new ArrayList<>();
         this.oneWay = oneWay;
         this.zIntervals = zIntervals;
+        this.speedLimit = speedLimit;
     }
 
     public HashMap<Coordinate, Integer> getzIntervals() {
