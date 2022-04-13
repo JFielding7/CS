@@ -92,7 +92,18 @@ public class Wilmington {
         
         // Intersection i1 = find(streets.get(3), streets.get(0));
         // Intersection i2 = find(streets.get(44), streets.get(64));
-        
+        // for(int i = 0; i < intersections.size() - 1; i++){
+        //     for(int j = i+1; j < intersections.size(); j++){
+        //         Intersection i1 = intersections.get(i);
+        //         Intersection i2 = intersections.get(j);
+        //         System.out.println(i + " " + i1);
+        //         System.out.println(j + " " + i2);
+        //         Group g = shortestPath(i1, i2); 
+        //         ArrayList<Instruction> p = g.path.compilePath(i1);
+                
+        //     }
+        // }
+        // System.out.println("Done");
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter starting location: ");
         String str1 = scan.nextLine();
@@ -271,16 +282,17 @@ class PathBuilder {
         PathBuilder p, prev, currPath;
         p = prev = currPath = this;
         
-        Instruction prevInstruction = new Instruction(currPath.current, "Arrive at your destination.", null);
+        Instruction prevInstruction = new Instruction(currPath.current, "Arrive at your destination.", p);
         ArrayList<Instruction> path = new ArrayList<>();
         path.add(prevInstruction);
         
         //creates the instructions by following through the entire path, starting at the end
         while(p != null){
+            
             String turn = p.turn(p);
             
             if(turn.charAt(0) == 'T' || turn.charAt(0) == 'C'){
-            
+                
                 currPath = p.previous;
                 Instruction currInstruction = new Instruction(currPath.current, turn, currPath);
                 path.add(0, currInstruction);
@@ -303,9 +315,11 @@ class PathBuilder {
         PathBuilder prev = p.previous;
         if(prev == null || prev.previous == null) return "Straight";
 
-        PathBuilder prev2 = p.previous.previous; 
-        if(prev2.block == null && p.current.onSameStreet(prev2.current))
-            return "Straight";
+        PathBuilder prev2 = p.previous.previous;
+        if(prev2.block == null){ 
+            if(p.current.onSameStreet(prev2.current))
+                return "Straight";
+        }
         
         else if(prev2.block.street == p.block.street ||
         prev.current.onSameStreet(p.current) && prev2.current.onSameStreet(p.current))
@@ -314,9 +328,11 @@ class PathBuilder {
         boolean movingUp = (prev.current.getLocation().x - prev2.current.getLocation().x) > 0;
         double longitudeDiff = p.current.getLocation().y - prev.block.street.getEqu().value(p.current.getLocation().x);
 
-        if(longitudeDiff < 0.00005)
+        if(Math.abs(longitudeDiff) < 0.00005){
+            System.out.println("Continue on to " + p.block.street.getName());
+            System.out.println(longitudeDiff);
             return "Continue on to " + p.block.street.getName();
-
+        }
         else if((movingUp && longitudeDiff > 0) || 
         (!movingUp && longitudeDiff < 0))
             return "Turn Right on to " + p.block.street.getName();
