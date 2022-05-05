@@ -20,7 +20,7 @@ public class Wilmington {
     //main method 
     //calls the wilmington method to set up the map
     //calls shortest path to find the route between 2 different locations
-    public static void findRoute(String str1, String str2) throws FileNotFoundException {
+    public static String findRoute(String str1, String str2) throws FileNotFoundException {
         
         // Intersection i1 = find(streets.get(3), streets.get(0));
         // Intersection i2 = find(streets.get(44), streets.get(64));
@@ -48,31 +48,28 @@ public class Wilmington {
         Coordinate c2 = new Coordinate(str2.substring(0, str2.indexOf(",")), str2.substring(str2.indexOf(",") + 2));
         Intersection i2 = find(c2);
 
-        System.out.println("Start:\n" + i1.street1().getName());
-        System.out.println(i1.street2().getName() + "\n");
+        // System.out.println("Start:\n" + i1.street1().getName());
+        // System.out.println(i1.street2().getName() + "\n");
 
-        System.out.println("Destination:\n" + i2.street1().getName());
-        System.out.println(i2.street2().getName() + "\n");
+        // System.out.println("Destination:\n" + i2.street1().getName());
+        // System.out.println(i2.street2().getName() + "\n");
         // System.out.println(i2.getLocation());
         
         Group g = shortestPath(i1, i2); 
 
         ArrayList<Instruction> p = g.path.compilePath(i1);
-
+        String route = "";
         for(Instruction inter : p){
 
-            System.out.println(inter.continueDist);
+            route += inter.continueDist + "\n";
             
-            System.out.println();
-            System.out.println(inter.i.street1().getName());
-            System.out.println(inter.i.street2().getName());
-            System.out.println(inter.turn);
+            route += inter.turn + "\n\n";
         }
         //total distance
-        System.out.println("Distance: " + (int)(g.dist * 100 + 0.5) / 100.0 + " miles");
-        System.out.println("Time: " + Math.round(g.time) + " minutes");
+        route += "Distance: " + (int)(g.dist * 100 + 0.5) / 100.0 + " miles" + "\n"
+        + "Time: " + Math.round(g.time) + " minutes";
         //scan.close();
-        
+        return route;
     }
 
     public static void wilmington() throws FileNotFoundException {
@@ -222,7 +219,7 @@ public class Wilmington {
             }
         }
         //return null if no such path exists between the start and the end
-        System.out.println("No path");
+        // System.out.println("No path");
         return null;
     }
 
@@ -330,8 +327,8 @@ class PathBuilder {
         double longitudeDiff = p.inter.getLocation().y - prev.block.street.getEqu().value(p.inter.getLocation().x);
 
         if(Math.abs(longitudeDiff) < 0.00005){
-            System.out.println("Continue on to " + p.block.street.getName());
-            System.out.println(longitudeDiff);
+            // System.out.println("Continue on to " + p.block.street.getName());
+            // System.out.println(longitudeDiff);
             return "Continue on to " + p.block.street.getName();
         }
         else if((movingUp && longitudeDiff > 0) || 
