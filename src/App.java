@@ -85,6 +85,8 @@ public class App extends Application {
         TextField start = new TextField();
         TextField destination = new TextField();
         start.setPrefSize(400, 50);
+        start.setEditable(false);
+        destination.setEditable(false);
         destination.setPrefSize(400, 50);
 
         Rectangle rect = new Rectangle();
@@ -100,6 +102,9 @@ public class App extends Application {
         
         Button go = new Button();
         go.setText("Go");
+        go.setPrefSize(100, 50);
+        go.setTextFill(Color.BLACK);
+        go.setBackground(Background.fill(Color.GREEN));
 
         grid.add(start, 0, 0); 
         grid.add(destination, 0, 1);
@@ -124,8 +129,6 @@ public class App extends Application {
 
         });
 
-       
-
         scene.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>(){
 
             @Override
@@ -146,6 +149,7 @@ public class App extends Application {
                     started = false;
                     start.setText("");
                     destination.setText("");
+                    directions.setText("");
                     for(int i = originalSize; i < roadLines.size(); i++){
                         map.getChildren().remove(roadLines.get(i).line);
                     }
@@ -181,21 +185,15 @@ public class App extends Application {
                 if(e.getDeltaY() > 0){
                     scaleX += .1;
                     scaleY += .1;
-                    scale.setX(scaleX);
-                    scale.setY(scaleY);
-                    //Scale s = new Scale(1.1, 1.1);
-                    // map.getTransforms().add(s);
-                    // System.out.println(map.getScaleX());
+                    
                 }
-                else if(e.getDeltaY() < 0){
+                else if(e.getDeltaY() < 0 && scaleX > .7) {
                     scaleX -= .1;
                     scaleY -= .1;
-                    scale.setX(scaleX);
-                    scale.setY(scaleY);
-                    //Scale s = new Scale(.9,.9);
-                    // map.getTransforms().add(s);
-    
+                    
                 }
+                scale.setX(scaleX);
+                scale.setY(scaleY);
                 
             }
         });
@@ -218,7 +216,7 @@ public class App extends Application {
             road.setEndY(convertToY(s.getCoord2().x));
             road.setStroke(Color.WHITE);
             Text text = new Text(s.getName());
-            text.setX((road.getStartX() + road.getEndX()) / 2);
+            text.setX((road.getStartX() + road.getEndX()) / 2 - 40);
             text.setY((road.getStartY() + road.getEndY()) / 2);
             text.setRotate(getAngle(s));
             //System.out.println(text.getRotate());
@@ -229,6 +227,15 @@ public class App extends Application {
             road.setStrokeWidth(2);
             map.getChildren().addAll(road, text);
             roadLines.add(new Pair(road, text));
+            // if(s.direction() != 0) {
+            //     Text t = new Text("-1");
+            //     t.setX(road.getEndX());
+            //     t.setY(road.getEndY());
+            //     Text d = new Text("1");
+            //     d.setX(road.getStartX());
+            //     d.setY(road.getStartY());
+            //     map.getChildren().addAll(t, d);
+            // }
             // streetLines.put(s.getName(), road);
             originalSize++;
             
@@ -240,15 +247,17 @@ public class App extends Application {
         return - Math.atan(1 / s.getSlope()) * 180 / Math.PI;
     }
 
-    public static void highLight(Intersection i1, Intersection i2){
+    public static void highLight(Intersection i1, Intersection i2, int x){
 
         Line street = new Line();
+        
         street.setStartX((i1.getLocation().y - LONG_MIN) / (LONG_MAX - (LONG_MIN))  * 2000);
         street.setEndX((i2.getLocation().y - LONG_MIN) / (LONG_MAX - (LONG_MIN))  * 2000);
         street.setStartY((LAT_MAX - i1.getLocation().x) / (LAT_MAX - LAT_MIN) * 1000); 
         street.setEndY((LAT_MAX - i2.getLocation().x) / (LAT_MAX - LAT_MIN) * 1000);
         street.setStroke(Color.BLUE);
         street.setStrokeWidth(3);
+
         map.getChildren().add(street);
         roadLines.add(new Pair(street));
     }

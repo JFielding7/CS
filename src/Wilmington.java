@@ -60,15 +60,16 @@ public class Wilmington {
         ArrayList<Instruction> p = g.path.compilePath(i1);
         String route = "";
         for(Instruction inter : p){
-
-            route += inter.continueDist + "\n";
-            
-            route += inter.turn + "\n\n";
+            if(inter != null){
+                route += inter.continueDist + "\n";
+                route += inter.turn + "\n\n";
+            }
         }
         //total distance
         route += "Distance: " + (int)(g.dist * 100 + 0.5) / 100.0 + " miles" + "\n"
-        + "Time: " + Math.round(g.time) + " minutes";
+        + "Time: " + (int) Math.ceil(g.time) + " minutes";
         //scan.close();
+        
         return route;
     }
 
@@ -281,6 +282,7 @@ class PathBuilder {
         Instruction prevInstruction = new Instruction(currPath.inter, "Arrive at your destination.", p);
         ArrayList<Instruction> path = new ArrayList<>();
         path.add(prevInstruction);
+        int num = 0;
         
         //creates the instructions by following through the entire path, starting at the end
         while(p != null){
@@ -293,16 +295,26 @@ class PathBuilder {
                 Instruction currInstruction = new Instruction(currPath.inter, turn, currPath);
                 path.add(0, currInstruction);
                 prevInstruction.setDist(currPath, prev);
-                App.highLight(currPath.inter, prev.inter);
+                //App.highLight(currPath.inter, prev.inter);
 
                 prevInstruction = currInstruction;
                 prev = currPath;
+            }
+            // else {
+            //     if(p.previous != null) {
+            //         App.highLight(p.inter, p.previous.inter);
+            //     }
+            // }
+            if(p.previous != null) {
+                
+                App.highLight(p.inter, p.previous.inter, num);
+                num++;
             }
             p = p.previous;
         }
 
         PathBuilder firstTurn = path.get(0).path;
-        App.highLight(firstTurn.inter, start);
+        //App.highLight(firstTurn.inter, start, num);
         path.get(0).setDist(null, firstTurn);
         
         return path;

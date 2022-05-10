@@ -38,6 +38,11 @@ public class Street {
         return 0;
     }
 
+    public int direction(){
+
+        return this.oneWay;
+    }
+
     public Equation getEqu() {
         return equ;
     }
