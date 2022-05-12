@@ -326,7 +326,7 @@ class PathBuilder {
         if(prev == null || prev.previous == null) return "Straight";
 
         PathBuilder prev2 = p.previous.previous;
-        if(prev2.block == null){ 
+        if(prev2.block == null){
             if(p.inter.onSameStreet(prev2.inter))
                 return "Straight";
         }
