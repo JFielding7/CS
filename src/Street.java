@@ -95,6 +95,15 @@ public class Street {
     public ArrayList<Intersection> getIntersections() {
         return intersections;
     }
+/*
+    public void setIntersections(ArrayList<Intersection> inter) {
+        this.intersections = new Intersection[inter.size()];
+        for(int i = 0; i < inter.size(); i++){
+            intersections[i] = inter.get(i);
+        }
+        sortIntersections(intersections, 0, intersections.length - 1);
+    }
+*/
 
     public void addIntersection(Intersection inter) {
         this.intersections.add(inter);
