@@ -26,6 +26,10 @@ public class Intersection {
         return this.streets[1];
     }
 
+    public Street[] getStreets(){
+        return this.streets;
+    }
+
     public void compileBlocks(){
 
         this.blocks = new Block[4];
@@ -45,15 +49,56 @@ public class Intersection {
     }
 
     public boolean onSameStreet(Intersection other){
-        String curr1 = this.streets[0].getName();
-        String curr2 = this.streets[1].getName();
-        String other1 = other.streets[0].getName();
-        String other2 = other.streets[1].getName();
-        return curr1.equals(other1) || curr1.equals(other2) || 
-        curr2.equals(other1) || curr2.equals(other2);
+
+        for(Street street : this.streets){
+            if(contains(other.getStreets(), street)) return true;
+        }
+        return false;
+        // String curr1 = this.streets[0].getName();
+        // String curr2 = this.streets[1].getName();
+        // String other1 = other.streets[0].getName();
+        // String other2 = other.streets[1].getName();
+        // return curr1.equals(other1) || curr1.equals(other2) || 
+        // curr2.equals(other1) || curr2.equals(other2);
+    }
+
+    public Street match(Intersection other){
+
+        for(Street street : this.streets){
+            if(contains(other.getStreets(), street)) return street;
+        }
+        return null;
+    }
+
+    public Street difference(Intersection other){
+
+        for(Street street : this.streets){
+            if(!contains(other.getStreets(), street)) return street;
+        }
+        return null;
+    }
+
+    static boolean contains(Street[] streets, Street target){
+
+        for(Street s : streets){
+            
+            if(s.same(target)) return true;
+        }
+        return false;
+    }
+
+    public void addStreet(Street s){
+
+        Street[] temp = new Street[streets.length + 1];
+        for(int i = 0; i < temp.length - 1; i++){
+            temp[i] = streets[i];
+        }
+        temp[temp.length - 1] = s;
+        this.streets = temp;
     }
 
     public String toString(){
+
         String str = "";
         for(Street s : streets){
             str += s.getName() + " ";

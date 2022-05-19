@@ -17,7 +17,15 @@
             "c:\\SDK\\javafx-sdk-18.0.1\\lib\\javafx.media.jar",
             "c:\\SDK\\javafx-sdk-18.0.1\\lib\\javafx.swing.jar",
             "c:\\SDK\\javafx-sdk-18.0.1\\lib\\javafx.web.jar",
-            "c:\\SDK\\javafx-sdk-18.0.1\\lib\\javafx-swt.jar"
+            "c:\\SDK\\javafx-sdk-18.0.1\\lib\\javafx-swt.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx-swt.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.web.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.swing.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.media.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.graphics.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.fxml.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.controls.jar",
+            "c:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib\\javafx.base.jar"
         ],
         "exclude": [
             "c:\\SDK\\openjfx-18.0.1_windows-x64_bin-sdk\\javafx-sdk-18.0.1\\lib\\javafx-swt.jar"

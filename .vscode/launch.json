@@ -9,6 +9,14 @@
             "type": "java",
             "name": "Launch App",
             "request": "launch",
+            "vmArgs": "--module-path C:\\Users\\josep\\Downloads\\openjfx-18_windows-x64_bin-sdk\\javafx-sdk-18\\lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "App",
+            "projectName": "CS_6383ffd0"
+        },
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
             "vmArgs": "--module-path C:\\SDK\\javafx-sdk-18.0.1\\lib --add-modules javafx.controls,javafx.fxml",
             "mainClass": "App",
             "projectName": "WilmingtonMap_43fb0994"

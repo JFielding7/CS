@@ -78,7 +78,7 @@ public class Wilmington {
         streets = new ArrayList<>();
         intersections = new ArrayList<>();
 
-        File street = new File("C:\\Users\\220700jf\\Documents\\WilmingtonMap\\src\\WilmingtonStreets.txt");
+        File street = new File("C:\\Users\\josep\\OneDrive\\Documents\\Map\\CS\\src\\WilmingtonStreets.txt");
         
         Scanner scan = new Scanner(street);
 
@@ -274,8 +274,35 @@ class PathBuilder {
         this.distance = distance;
     }
 
+    public void findOverlaps(){
+
+        PathBuilder p = this;
+        while(p != null){
+            
+            while(p.previous != null && Wilmington.calcDistance(p.inter.getLocation(), p.previous.inter.getLocation()) < 0.0038){
+                
+                //System.out.println(p.previous.block);
+                Street diff = p.previous.inter.difference(p.inter);
+                // System.out.println("DIFF:");
+                // System.out.println(p.inter);
+                // System.out.println(p.previous.inter);
+                // System.out.println(diff);
+                if(diff != null) p.inter.addStreet(diff);
+                p.previous = p.previous.previous;
+                if(p.previous != null && p.previous.previous != null){
+                    // System.out.println(p.inter);
+                    // System.out.println("Prev " + p.previous.inter);
+                    // System.out.println(p.previous.previous.inter);
+                    p.block.street = p.inter.match(p.previous.inter);
+                }
+            }
+            p = p.previous;
+        }
+    }
+
     public ArrayList<Instruction> compilePath(Intersection start) {
 
+        this.findOverlaps();
         PathBuilder p, prev, currPath;
         p = prev = currPath = this;
         
@@ -286,6 +313,9 @@ class PathBuilder {
         
         //creates the instructions by following through the entire path, starting at the end
         while(p != null){
+            // System.out.println(p.inter);
+            // System.out.println(p.block.street);
+            // System.out.println();
             
             String turn = p.turn(p);
             
@@ -330,10 +360,16 @@ class PathBuilder {
             if(p.inter.onSameStreet(prev2.inter))
                 return "Straight";
         }
-        
         else if(prev2.block.street == p.block.street ||
         prev.inter.onSameStreet(p.inter) && prev2.inter.onSameStreet(p.inter))
             return "Straight";
+
+        // System.out.println(p.inter);
+        // System.out.println(prev.inter);
+        // System.out.println(prev2.inter);
+        // System.out.println(prev2.inter.getStreets().length);
+        // System.out.println(prev2.inter.onSameStreet(p.inter));
+        // System.out.println();
         
         boolean movingUp = (prev.inter.getLocation().x - prev2.inter.getLocation().x) > 0;
         double longitudeDiff = p.inter.getLocation().y - prev.block.street.getEqu().value(p.inter.getLocation().x);
@@ -341,6 +377,15 @@ class PathBuilder {
         if(Math.abs(longitudeDiff) < 0.00005){
             // System.out.println("Continue on to " + p.block.street.getName());
             // System.out.println(longitudeDiff);
+            // System.out.println(p.inter.getStreets().length);
+            // System.out.println(p.inter);
+            // System.out.println(p.previous.inter);
+            // System.out.println(p.block.street);
+            // System.out.println(prev.block.street);
+            // System.out.println(prev2.block.street);
+            // System.out.println(prev.block);
+            // if(prev2 != null) System.out.println(prev2.block);
+            //System.out.println();
             return "Continue on to " + p.block.street.getName();
         }
         else if((movingUp && longitudeDiff > 0) || 
