@@ -24,6 +24,10 @@ public class Street {
         this.speedLimit = speedLimit;
     }
 
+    public Street(String name){
+        this.name = name;
+    }
+
     public HashMap<Coordinate, Integer> getzIntervals() {
 
         return zIntervals;
@@ -80,18 +84,17 @@ public class Street {
         return this.coord1.y > this.coord2.y ? coord1.y : coord2.y;
     }
 
+    public Coordinate maxLongCoord(){
+        return this.coord1.y > this.coord2.y ? coord1 : coord2; 
+    }
+
+    public Coordinate minLongCoord(){
+        return this.coord1.y < this.coord2.y ? coord1 : coord2; 
+    }
+
     public ArrayList<Intersection> getIntersections() {
         return intersections;
     }
-/*
-    public void setIntersections(ArrayList<Intersection> inter) {
-        this.intersections = new Intersection[inter.size()];
-        for(int i = 0; i < inter.size(); i++){
-            intersections[i] = inter.get(i);
-        }
-        sortIntersections(intersections, 0, intersections.length - 1);
-    }
-*/
 
     public void addIntersection(Intersection inter) {
         this.intersections.add(inter);
@@ -152,6 +155,13 @@ public class Street {
 
     public String toString(){
         return this.getName();
+    }
+
+    public boolean same(Street s) {
+        
+        return (this == s) || this.name.equals(s.name) && 
+        (Wilmington.calcDistance(this.maxLongCoord(), s.minLongCoord()) < .0038 
+        || Wilmington.calcDistance(this.minLongCoord(), s.maxLongCoord()) < .0038);
     }
 
 }

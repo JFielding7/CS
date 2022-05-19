@@ -10,50 +10,20 @@ import java.util.Set;
 
 public class Wilmington {
 
-    private static final double LATITUDE50FT = 0.00013724198;
-    private static final double LONGITUDE50FT = 0.000173437674;
+    private static final double LONGITUDE50FT = 0.00013724198;
+    private static final double LATITUDE50FT = 0.000173437674;
 
-    //private static Address[] places;
     static ArrayList<Street> streets;
     private static ArrayList<Intersection> intersections;
 
-    //main method 
-    //calls the wilmington method to set up the map
     //calls shortest path to find the route between 2 different locations
     public static String findRoute(String str1, String str2) throws FileNotFoundException {
-        
-        // Intersection i1 = find(streets.get(3), streets.get(0));
-        // Intersection i2 = find(streets.get(44), streets.get(64));
-        // for(int i = 0; i < intersections.size() - 1; i++){
-        //     for(int j = i+1; j < intersections.size(); j++){
-        //         Intersection i1 = intersections.get(i);
-        //         Intersection i2 = intersections.get(j);
-        //         System.out.println(i + " " + i1);
-        //         System.out.println(j + " " + i2);
-        //         Group g = shortestPath(i1, i2); 
-        //         ArrayList<Instruction> p = g.path.compilePath(i1);
-                
-        //     }
-        // }
-        // System.out.println("Done");
 
-        // Scanner scan = new Scanner(System.in);
-        // System.out.print("Enter starting location: ");
-        // String str1 = scan.nextLine();
         Coordinate c1 = new Coordinate(str1.substring(0, str1.indexOf(",")), str1.substring(str1.indexOf(",") + 2));
         Intersection i1 = find(c1);
 
-        // System.out.print("Enter destination: ");
-        // String str2 = scan.nextLine();
         Coordinate c2 = new Coordinate(str2.substring(0, str2.indexOf(",")), str2.substring(str2.indexOf(",") + 2));
         Intersection i2 = find(c2);
-
-        // System.out.println("Start:\n" + i1.street1().getName());
-        // System.out.println(i1.street2().getName() + "\n");
-
-        // System.out.println("Destination:\n" + i2.street1().getName());
-        // System.out.println(i2.street2().getName() + "\n");
-        // System.out.println(i2.getLocation());
         
         Group g = shortestPath(i1, i2); 
 
@@ -65,14 +35,15 @@ public class Wilmington {
                 route += inter.turn + "\n\n";
             }
         }
+
         //total distance
         route += "Distance: " + (int)(g.dist * 100 + 0.5) / 100.0 + " miles" + "\n"
         + "Time: " + (int) Math.ceil(g.time) + " minutes";
-        //scan.close();
         
         return route;
     }
 
+    //wilmington method, sets up the map, streets, and intersections
     public static void wilmington() throws FileNotFoundException {
         
         streets = new ArrayList<>();
@@ -133,10 +104,10 @@ public class Wilmington {
     //finds the intersections between roads with and error of 50ft
     public static boolean doesInter(Street s1, Street s2, Coordinate inter) {
         
-        return s1.zPosition(inter.x) == s2.zPosition(inter.x) && (inter.x >= s1.xLowerBound() - LONGITUDE50FT && inter.x <= s1.xUpperBound() + LONGITUDE50FT 
-        && inter.y >= s1.yLowerBound() - LATITUDE50FT && inter.y <= s1.yUpperBound() + LATITUDE50FT
-        && inter.x >= s2.xLowerBound() - LONGITUDE50FT && inter.x <= s2.xUpperBound() + LONGITUDE50FT 
-        && inter.y >= s2.yLowerBound() - LATITUDE50FT && inter.y <= s2.yUpperBound() + LATITUDE50FT);
+        return s1.zPosition(inter.x) == s2.zPosition(inter.x) && (inter.x >= s1.xLowerBound() - LATITUDE50FT && inter.x <= s1.xUpperBound() + LATITUDE50FT 
+        && inter.y >= s1.yLowerBound() - LONGITUDE50FT && inter.y <= s1.yUpperBound() + LONGITUDE50FT
+        && inter.x >= s2.xLowerBound() - LATITUDE50FT && inter.x <= s2.xUpperBound() + LATITUDE50FT 
+        && inter.y >= s2.yLowerBound() - LONGITUDE50FT && inter.y <= s2.yUpperBound() + LONGITUDE50FT);
     }
     
     //finds the closest intersection to the given Coordinate
@@ -184,7 +155,7 @@ public class Wilmington {
         
         while(!queue.isEmpty()){
             
-            //pulls the next node, distance, and path from the queue
+            //pulls the next node, distance, time, and path from the queue
             Group next = queue.poll();
             Intersection node = next.node;
             double dist = next.dist;
@@ -196,6 +167,7 @@ public class Wilmington {
                 return next;
 
             //loops through all the neighbor nodes of this node and adds them to the queue if they are not yet visited
+            //nodes that take the shortest time to reach will be given priority, they will move to the front of the queue
             Block[] blocks = node.getBlocks();
             
             for(int i = 0; i < blocks.length; i++) {
@@ -219,8 +191,8 @@ public class Wilmington {
                 }
             }
         }
+
         //return null if no such path exists between the start and the end
-        // System.out.println("No path");
         return null;
     }
 
@@ -274,8 +246,29 @@ class PathBuilder {
         this.distance = distance;
     }
 
+    //intersections that overlap, and combines then into 1 intersection
+    public void findOverlaps(){
+
+        PathBuilder p = this;
+        while(p != null){
+            
+            while(p.previous != null && Wilmington.calcDistance(p.inter.getLocation(), p.previous.inter.getLocation()) < 0.0038){
+                
+                Street diff = p.previous.inter.difference(p.inter);
+                
+                if(diff != null) p.inter.addStreet(diff);
+                p.previous = p.previous.previous;
+                if(p.previous != null && p.previous.previous != null)
+                    p.block.street = p.inter.match(p.previous.inter);
+            }
+
+            p = p.previous;
+        }
+    }
+
     public ArrayList<Instruction> compilePath(Intersection start) {
 
+        this.findOverlaps();
         PathBuilder p, prev, currPath;
         p = prev = currPath = this;
         
@@ -295,31 +288,24 @@ class PathBuilder {
                 Instruction currInstruction = new Instruction(currPath.inter, turn, currPath);
                 path.add(0, currInstruction);
                 prevInstruction.setDist(currPath, prev);
-                //App.highLight(currPath.inter, prev.inter);
 
                 prevInstruction = currInstruction;
                 prev = currPath;
             }
-            // else {
-            //     if(p.previous != null) {
-            //         App.highLight(p.inter, p.previous.inter);
-            //     }
-            // }
-            if(p.previous != null) {
-                
+
+            if(p.previous != null) 
                 App.highLight(p.inter, p.previous.inter, num);
-                num++;
-            }
+            
             p = p.previous;
         }
 
         PathBuilder firstTurn = path.get(0).path;
-        //App.highLight(firstTurn.inter, start, num);
         path.get(0).setDist(null, firstTurn);
         
         return path;
     }
 
+    //find which way you have to turn at an intersection, or if you go straight
     private String turn(PathBuilder p){
         
         PathBuilder prev = p.previous;
@@ -330,7 +316,6 @@ class PathBuilder {
             if(p.inter.onSameStreet(prev2.inter))
                 return "Straight";
         }
-        
         else if(prev2.block.street == p.block.street ||
         prev.inter.onSameStreet(p.inter) && prev2.inter.onSameStreet(p.inter))
             return "Straight";
@@ -338,11 +323,9 @@ class PathBuilder {
         boolean movingUp = (prev.inter.getLocation().x - prev2.inter.getLocation().x) > 0;
         double longitudeDiff = p.inter.getLocation().y - prev.block.street.getEqu().value(p.inter.getLocation().x);
 
-        if(Math.abs(longitudeDiff) < 0.00005){
-            // System.out.println("Continue on to " + p.block.street.getName());
-            // System.out.println(longitudeDiff);
+        if(Math.abs(longitudeDiff) < 0.00005)
             return "Continue on to " + p.block.street.getName();
-        }
+        
         else if((movingUp && longitudeDiff > 0) || 
         (!movingUp && longitudeDiff < 0))
             return "Turn Right on to " + p.block.street.getName();
@@ -366,14 +349,6 @@ class Instruction{
         this.path = path;
     }
 
-    // void setDist(double dist){
-        
-    //     if(dist < 0.01) this.continueDist = "";
-    //     else if(dist < 0.1) this.continueDist = "Continue for " + Math.round(dist * 5280) + " ft";
-    //     else this.continueDist = "Continue for " + (int) (dist * 100 + 0.5) / 100.0 + " miles";
-
-    // }
-
     void setDist(PathBuilder p1, PathBuilder p2){
 
         double dist = 0;
@@ -387,5 +362,3 @@ class Instruction{
     }
 
 }
-
-
